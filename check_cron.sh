@@ -26,8 +26,18 @@ else
     (crontab -l | grep -F "@reboot pkill -kill -u $(whoami) && ${CRON_NEZHA}") || (crontab -l; echo "@reboot pkill -kill -u $(whoami) && ${CRON_NEZHA}") | crontab -
     (crontab -l | grep -F "* * pgrep -x \"nezha-agent\" > /dev/null || ${CRON_NEZHA}") || (crontab -l; echo "*/12 * * * * pgrep -x \"nezha-agent\" > /dev/null || ${CRON_NEZHA}") | crontab -
   elif [ -e "${FILE_PATH}/config.json" ]; then
-    echo "添加 socks5 的 crontab 重启任务"
-    (crontab -l | grep -F "@reboot pkill -kill -u $(whoami) && ${CRON_S5}") || (crontab -l; echo "@reboot pkill -kill -u $(whoami) && ${CRON_S5}") | crontab -
-    (crontab -l | grep -F "* * pgrep -x \"s5\" > /dev/null || ${CRON_S5}") || (crontab -l; echo "5 * * * * pgrep -x \"s5\" > /dev/null || ${CRON_S5}") | crontab -
+    # echo "添加 socks5 的 crontab 重启任务"
+    # (crontab -l | grep -F "@reboot pkill -kill -u $(whoami) && ${CRON_S5}") || (crontab -l; echo "@reboot pkill -kill -u $(whoami) && ${CRON_S5}") | crontab -
+    # (crontab -l | grep -F "* * pgrep -x \"s5\" > /dev/null || ${CRON_S5}") || (crontab -l; echo "5 * * * * pgrep -x \"s5\" > /dev/null || ${CRON_S5}") | crontab -
+    echo "添加 socks5 的 crontab 重启任务和定时任务"
+
+    # 添加重启任务
+    CRON_REBOOT="@reboot pkill -kill -u $(whoami) && ${CRON_S5}"
+    (crontab -l 2>/dev/null | grep -F "${CRON_REBOOT}") || (crontab -l 2>/dev/null; echo "${CRON_REBOOT}") | crontab -
+    
+    # 添加定时任务
+    CRON_CHECK="5 * * * * pgrep -x \"s5\" > /dev/null || ${CRON_S5}"
+    (crontab -l 2>/dev/null | grep -F "${CRON_CHECK}") || (crontab -l 2>/dev/null; echo "${CRON_CHECK}") | crontab -
+
   fi
 fi
