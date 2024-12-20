@@ -267,7 +267,7 @@ read -p "是否添加 crontab 守护进程的计划任务(Y/N 回车N): " cronta
 crontabgogogo=${crontabgogogo^^} # 转换为大写
 if [ "$crontabgogogo" == "Y" ]; then
   echo "添加 crontab 守护进程的计划任务"
-  curl -s https://raw.githubusercontent.com/cmliu/socks5-for-serv00/main/check_cron.sh | bash
+  curl -s https://raw.githubusercontent.com/duanxinyua/socks5-for-serv00/main/check_cron.sh | bash
 else
   echo "不添加 crontab 计划任务"
 fi
