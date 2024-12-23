@@ -43,7 +43,7 @@ else
   #添加面板的自动重启
   elif [ -e "${WORKDIR_dashboard}/start.sh" ]; then
       nohup ${WORKDIR_dashboard}/start.sh >/dev/null 2>&1 &
-      printf "正在启动nezha-dashboard，请耐心等待...\n"
+      echo "正在启动nezha-dashboard，请耐心等待...\n"
       sleep 3
       if pgrep -f "dashboard" > /dev/null; then
           echo "nezha-dashboard 已启动。"
