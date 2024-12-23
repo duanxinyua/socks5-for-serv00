@@ -45,6 +45,7 @@ fi
 
 # 独立检查 nezha-dashboard
 if [ -e "${WORKDIR_dashboard}/start.sh" ]; then
+  echo "检测到哪吒面板，正在重启。"
   nohup ${WORKDIR_dashboard}/start.sh >/dev/null 2>&1 &
   echo "正在启动 nezha-dashboard，请耐心等待..."
   sleep 3
