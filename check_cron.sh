@@ -40,15 +40,17 @@ else
     CRON_CHECK="5 * * * * pgrep -x \"s5\" > /dev/null || ${CRON_S5}"
     (crontab -l 2>/dev/null | grep -F "${CRON_CHECK}") || (crontab -l 2>/dev/null; echo "${CRON_CHECK}") | crontab -
 
-  #添加面板的自动重启
-  elif [ -e "${WORKDIR_dashboard}/start.sh" ]; then
-      nohup ${WORKDIR_dashboard}/start.sh >/dev/null 2>&1 &
-      echo "正在启动nezha-dashboard，请耐心等待...\n"
-      sleep 3
-      if pgrep -f "dashboard" > /dev/null; then
-          echo "nezha-dashboard 已启动。"
-      else
-          echo "nezha-dashboard 启动失败，请检查端口开放情况，并保证参数填写正确，再重新安装！"
-      fi
+  fi
+fi
+
+# 独立检查 nezha-dashboard
+if [ -e "${WORKDIR_dashboard}/start.sh" ]; then
+  nohup ${WORKDIR_dashboard}/start.sh >/dev/null 2>&1 &
+  echo "正在启动 nezha-dashboard，请耐心等待..."
+  sleep 3
+  if pgrep -f "dashboard" > /dev/null; then
+    echo "nezha-dashboard 已启动。"
+  else
+    echo "nezha-dashboard 启动失败，请检查端口开放情况，并保证参数填写正确，再重新安装！"
   fi
 fi
