@@ -12,34 +12,49 @@ REBOOT_COMMAND="@reboot pkill -kill -u $(whoami) && $PM2_PATH resurrect >> /home
 
 echo "检查并添加 crontab 任务"
 
+# 检查和添加任务函数
+add_cron_task() {
+  local task="$1"
+  local retry=0
+  local max_retries=3
+
+  until [ $retry -ge $max_retries ]; do
+    # 检查任务是否存在
+    if (crontab -l 2>/dev/null | grep -Fq "$task"); then
+      echo "任务 '$task' 已成功添加。"
+      return 0
+    fi
+
+    # 任务不存在，尝试添加
+    (crontab -l 2>/dev/null; echo "$task") | crontab -
+    ((retry++))
+    echo "尝试添加任务 '$task'（第 $retry 次）..."
+
+    sleep 1 # 等待1秒后重试
+  done
+
+  echo "任务 '$task' 添加失败，重试 $max_retries 次仍未成功！"
+  return 1
+}
+
 if [ "$(command -v pm2)" == "/home/${USER}/.npm-global/bin/pm2" ]; then
   echo "已安装 pm2，并返回正确路径，启用 pm2 保活任务"
-  (crontab -l | grep -F "$REBOOT_COMMAND") || (crontab -l; echo "$REBOOT_COMMAND") | crontab -
-  (crontab -l | grep -F "$CRON_JOB") || (crontab -l; echo "$CRON_JOB") | crontab -
+  add_cron_task "$REBOOT_COMMAND"
+  add_cron_task "$CRON_JOB"
 else
   if [ -e "${WORKDIR}/start.sh" ] && [ -e "${FILE_PATH}/config.json" ]; then
     echo "添加 nezha & socks5 的 crontab 重启任务"
-    (crontab -l | grep -F "@reboot pkill -kill -u $(whoami) && ${CRON_S5} && ${CRON_NEZHA}") || (crontab -l; echo "@reboot pkill -kill -u $(whoami) && ${CRON_S5} && ${CRON_NEZHA}") | crontab -
-    (crontab -l | grep -F "* * pgrep -x \"nezha-agent\" > /dev/null || ${CRON_NEZHA}") || (crontab -l; echo "*/12 * * * * pgrep -x \"nezha-agent\" > /dev/null || ${CRON_NEZHA}") | crontab -
-    (crontab -l | grep -F "* * pgrep -x \"s5\" > /dev/null || ${CRON_S5}") || (crontab -l; echo "*/12 * * * * pgrep -x \"s5\" > /dev/null || ${CRON_S5}") | crontab -
+    add_cron_task "@reboot pkill -kill -u $(whoami) && ${CRON_S5} && ${CRON_NEZHA}"
+    add_cron_task "*/12 * * * * pgrep -x \"nezha-agent\" > /dev/null || ${CRON_NEZHA}"
+    add_cron_task "*/12 * * * * pgrep -x \"s5\" > /dev/null || ${CRON_S5}"
   elif [ -e "${WORKDIR}/start.sh" ]; then
     echo "添加 nezha 的 crontab 重启任务"
-    (crontab -l | grep -F "@reboot pkill -kill -u $(whoami) && ${CRON_NEZHA}") || (crontab -l; echo "@reboot pkill -kill -u $(whoami) && ${CRON_NEZHA}") | crontab -
-    (crontab -l | grep -F "* * pgrep -x \"nezha-agent\" > /dev/null || ${CRON_NEZHA}") || (crontab -l; echo "*/12 * * * * pgrep -x \"nezha-agent\" > /dev/null || ${CRON_NEZHA}") | crontab -
+    add_cron_task "@reboot pkill -kill -u $(whoami) && ${CRON_NEZHA}"
+    add_cron_task "*/12 * * * * pgrep -x \"nezha-agent\" > /dev/null || ${CRON_NEZHA}"
   elif [ -e "${FILE_PATH}/config.json" ]; then
-    # echo "添加 socks5 的 crontab 重启任务"
-    # (crontab -l | grep -F "@reboot pkill -kill -u $(whoami) && ${CRON_S5}") || (crontab -l; echo "@reboot pkill -kill -u $(whoami) && ${CRON_S5}") | crontab -
-    # (crontab -l | grep -F "* * pgrep -x \"s5\" > /dev/null || ${CRON_S5}") || (crontab -l; echo "5 * * * * pgrep -x \"s5\" > /dev/null || ${CRON_S5}") | crontab -
     echo "添加 socks5 的 crontab 重启任务和定时任务"
-
-    # 添加重启任务
-    CRON_REBOOT="@reboot pkill -kill -u $(whoami) && ${CRON_S5}"
-    (crontab -l 2>/dev/null | grep -F "${CRON_REBOOT}") || (crontab -l 2>/dev/null; echo "${CRON_REBOOT}") | crontab -
-    
-    # 添加定时任务
-    CRON_CHECK="5 * * * * pgrep -x \"s5\" > /dev/null || ${CRON_S5}"
-    (crontab -l 2>/dev/null | grep -F "${CRON_CHECK}") || (crontab -l 2>/dev/null; echo "${CRON_CHECK}") | crontab -
-
+    add_cron_task "@reboot pkill -kill -u $(whoami) && ${CRON_S5}"
+    add_cron_task "5 * * * * pgrep -x \"s5\" > /dev/null || ${CRON_S5}"
   fi
 fi
 
