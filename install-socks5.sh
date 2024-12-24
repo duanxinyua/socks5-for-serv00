@@ -186,6 +186,22 @@ EOF
     chmod +x ${WORKDIR}/start.sh
 }
 
+# run_agent(){
+#     nohup ${WORKDIR}/start.sh >/dev/null 2>&1 &
+#     printf "nezha-agent已经准备就绪，请按下回车键启动\n"
+#     read
+#     printf "正在启动nezha-agent，请耐心等待...\n"
+#     sleep 3
+#     if pgrep -f "nezha-agent -s" > /dev/null; then
+#         echo "nezha-agent 已启动！"
+#         echo "如果面板处未上线，请检查参数是否填写正确，并停止 agent 进程，删除已安装的 agent 后重新安装！"
+#         echo "停止 agent 进程的命令：pgrep -f 'nezha-agent' | xargs -r kill"
+#         echo "删除已安装的 agent 的命令：rm -rf ~/.nezha-agent"
+#     else
+#         rm -rf "${WORKDIR}"
+#         echo "nezha-agent 启动失败，请检查参数填写是否正确，并重新安装！"
+#     fi
+# }
 run_agent(){
     nohup ${WORKDIR}/start.sh >/dev/null 2>&1 &
     printf "nezha-agent已经准备就绪，请按下回车键启动\n"
@@ -197,6 +213,8 @@ run_agent(){
         echo "如果面板处未上线，请检查参数是否填写正确，并停止 agent 进程，删除已安装的 agent 后重新安装！"
         echo "停止 agent 进程的命令：pgrep -f 'nezha-agent' | xargs -r kill"
         echo "删除已安装的 agent 的命令：rm -rf ~/.nezha-agent"
+        echo
+        echo "如果你想使用 pm2 管理 agent 进程，请执行：pm2 start ~/.nezha-agent/start.sh --name nezha-agent"
     else
         rm -rf "${WORKDIR}"
         echo "nezha-agent 启动失败，请检查参数填写是否正确，并重新安装！"
