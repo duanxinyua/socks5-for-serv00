@@ -77,7 +77,7 @@ fi
 PID=$(pgrep -f "x-ui")
 if [ -e "${WORKDIR_xui}/x-ui.sh" ]; then
   echo "检测到存在xui，正在停止。"
-  kill $PID
+  kill "$PID"
   sleep 3
   if pgrep -f "x-ui" > /dev/null; then
     echo "xui 停止，正在重启启动中。"
