@@ -75,29 +75,36 @@ fi
 
 # 独立检查 X-UI
 PID=$(pgrep -f "x-ui")
+
+# 检查工作目录和 x-ui.sh 是否存在
 if [ -e "${WORKDIR_xui}/x-ui.sh" ]; then
-  echo "检测到存在xui，正在停止。"
-  kill "$PID"
-  sleep 3
-  if pgrep -f "x-ui" > /dev/null; then
-    echo "xui 停止失败，正在重启启动中。"
+  echo "检测到存在 X-UI，正在停止..."
+
+  # 停止 X-UI
+  if [ -n "$PID" ]; then
     kill "$PID"
     sleep 3
-    nohup ${WORKDIR_xui}/x-ui.sh restart >/dev/null 2>&1 &
-    sleep 3
     if pgrep -f "x-ui" > /dev/null; then
-      echo "xui 已启动。"
+      echo "X-UI 停止失败，尝试再次停止..."
+      kill "$PID"
+      sleep 3
     else
-      echo "xui 启动失败，请检查定时脚本！89"
+      echo "X-UI 已成功停止。"
     fi
   else
-    echo "xui 停止成功！启动中。"
-    nohup ${WORKDIR_xui}/x-ui.sh restart >/dev/null 2>&1 &
-    sleep 3
-    if pgrep -f "x-ui" > /dev/null; then
-      echo "xui 已启动。"
-    else
-      echo "xui 启动失败，请检查定时脚本！98"
-    fi
+    echo "未检测到运行中的 X-UI 进程。"
   fi
+
+  # 启动 X-UI
+  echo "正在启动 X-UI..."
+  nohup "${WORKDIR_xui}/x-ui.sh" restart >/dev/null 2>&1 &
+  nohup "${WORKDIR_xui}/x-ui.sh" enable >/dev/null 2>&1 &
+  sleep 3
+  if pgrep -f "x-ui" > /dev/null; then
+    echo "X-UI 已成功启动。"
+  else
+    echo "X-UI 启动失败，请检查定时脚本！"
+  fi
+else
+  echo "错误：未找到 ${WORKDIR_xui}/x-ui.sh，请检查 WORKDIR_xui 是否正确设置。"
 fi
