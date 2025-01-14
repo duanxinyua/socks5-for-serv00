@@ -75,7 +75,7 @@ fi
 
 # 独立检查 X-UI
 PID=$(pgrep -f "x-ui")
-if [ -n "$PID" ]; then
+if [ -e "${WORKDIR_xui}/x-ui.sh" ]; then
   echo "检测到存在xui，正在停止。"
   kill $PID
   sleep 3
