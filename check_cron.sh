@@ -80,22 +80,24 @@ if [ -e "${WORKDIR_xui}/x-ui.sh" ]; then
   kill "$PID"
   sleep 3
   if pgrep -f "x-ui" > /dev/null; then
-    echo "xui 停止，正在重启启动中。"
+    echo "xui 停止失败，正在重启启动中。"
+    kill "$PID"
+    sleep 3
     nohup ${WORKDIR_xui}/x-ui.sh restart >/dev/null 2>&1 &
     sleep 3
     if pgrep -f "x-ui" > /dev/null; then
       echo "xui 已启动。"
     else
-      echo "xui 启动失败，请检查定时脚本！"
+      echo "xui 启动失败，请检查定时脚本！89"
     fi
   else
-    echo "xui 停止失败，可能xui并没有运行！启动中。"
+    echo "xui 停止成功！启动中。"
     nohup ${WORKDIR_xui}/x-ui.sh restart >/dev/null 2>&1 &
     sleep 3
     if pgrep -f "x-ui" > /dev/null; then
       echo "xui 已启动。"
     else
-      echo "xui 启动失败，请检查定时脚本！"
+      echo "xui 启动失败，请检查定时脚本！98"
     fi
   fi
 fi
