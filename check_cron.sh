@@ -3,6 +3,7 @@
 USER=$(whoami)
 WORKDIR="/home/${USER}/.nezha-agent"
 WORKDIR_dashboard="/home/${USER}/.nezha-dashboard"
+WORKDIR_xui="/home/${USER}/x-ui"
 FILE_PATH="/home/${USER}/.s5"
 CRON_S5="nohup ${FILE_PATH}/s5 -c ${FILE_PATH}/config.json >/dev/null 2>&1 &"
 CRON_NEZHA="nohup ${WORKDIR}/start.sh >/dev/null 2>&1 &"
@@ -68,5 +69,26 @@ if [ -e "${WORKDIR_dashboard}/start.sh" ]; then
     echo "nezha-dashboard 已启动。"
   else
     echo "nezha-dashboard 启动失败，请检查端口开放情况，并保证参数填写正确，再重新安装！"
+  fi
+fi
+
+
+# 独立检查 X-UI
+PID=$(pgrep -f "x-ui")
+if [ -n "$PID" ]; then
+  echo "检测到存在xui，正在停止。"
+  kill $PID
+  sleep 3
+  if pgrep -f "x-ui" > /dev/null; then
+    echo "xui 停止，正在重启启动中。"
+    nohup ${WORKDIR_xui}/x-ui.sh restart >/dev/null 2>&1 &
+    sleep 3
+    if pgrep -f "x-ui" > /dev/null; then
+      echo "xui 已启动。"
+    else
+      echo "xui 启动失败，请检查定时脚本！"
+    fi
+  else
+    echo "xui 停止失败，请检查定时脚本，可能xui并没有运行！"
   fi
 fi
