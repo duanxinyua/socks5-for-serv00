@@ -106,5 +106,5 @@ if [ -e "${WORKDIR_xui}/x-ui.sh" ]; then
     echo "X-UI 启动失败，请检查定时脚本！"
   fi
 else
-  echo "错误：未找到 ${WORKDIR_xui}/x-ui.sh，请检查 WORKDIR_xui 是否正确设置。"
+  echo "没有安装X-UI，跳过此项任务。"
 fi
