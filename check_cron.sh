@@ -8,7 +8,7 @@ FILE_PATH="/home/${USER}/.s5"
 CRON_S5="nohup ${FILE_PATH}/s5 -c ${FILE_PATH}/config.json >/dev/null 2>&1 &"
 CRON_NEZHA="nohup ${WORKDIR}/start.sh >/dev/null 2>&1 &"
 PM2_PATH="/home/${USER}/.npm-global/lib/node_modules/pm2/bin/pm2"
-CRON_JOB="*/12 * * * * $PM2_PATH resurrect >> /home/$(whoami)/pm2_resurrect.log 2>&1"
+CRON_JOB="0 * * * * $PM2_PATH resurrect >> /home/$(whoami)/pm2_resurrect.log 2>&1"
 REBOOT_COMMAND="@reboot pkill -kill -u $(whoami) && $PM2_PATH resurrect >> /home/$(whoami)/pm2_resurrect.log 2>&1"
 
 echo "检查并添加 crontab 任务"
@@ -46,12 +46,12 @@ else
   if [ -e "${WORKDIR}/start.sh" ] && [ -e "${FILE_PATH}/config.json" ]; then
     echo "添加 nezha & socks5 的 crontab 重启任务"
     add_cron_task "@reboot pkill -kill -u $(whoami) && ${CRON_S5} && ${CRON_NEZHA}"
-    add_cron_task "*/12 * * * * pgrep -x \"nezha-agent\" > /dev/null || ${CRON_NEZHA}"
-    add_cron_task "*/12 * * * * pgrep -x \"s5\" > /dev/null || ${CRON_S5}"
+    add_cron_task "0 * * * * pgrep -x \"nezha-agent\" > /dev/null || ${CRON_NEZHA}"
+    add_cron_task "0 * * * * pgrep -x \"s5\" > /dev/null || ${CRON_S5}"
   elif [ -e "${WORKDIR}/start.sh" ]; then
     echo "添加 nezha 的 crontab 重启任务"
     add_cron_task "@reboot pkill -kill -u $(whoami) && ${CRON_NEZHA}"
-    add_cron_task "*/12 * * * * pgrep -x \"nezha-agent\" > /dev/null || ${CRON_NEZHA}"
+    add_cron_task "0 * * * * pgrep -x \"nezha-agent\" > /dev/null || ${CRON_NEZHA}"
   elif [ -e "${FILE_PATH}/config.json" ]; then
     echo "添加 socks5 的 crontab 重启任务和定时任务"
     add_cron_task "@reboot pkill -kill -u $(whoami) && ${CRON_S5}"
