@@ -87,8 +87,6 @@ if [ -d "${WORKDIR_alist}" ] && ! pgrep -f "screen.*alist" > /dev/null; then
   else
     echo "alist 启动失败，请检查端口开放情况，并确保参数填写正确，再重新安装！"
   fi
-else
-  echo "目录不存在，无需启动。"
 fi
 
 
