@@ -3,6 +3,7 @@
 USER=$(whoami)
 WORKDIR="/home/${USER}/.nezha-agent"
 WORKDIR_dashboard="/home/${USER}/.nezha-dashboard"
+WORKDIR_alist="/home/${USER}/domains/alist.hetao.pw"
 WORKDIR_xui="/home/${USER}"
 FILE_PATH="/home/${USER}/.s5"
 CRON_S5="nohup ${FILE_PATH}/s5 -c ${FILE_PATH}/config.json >/dev/null 2>&1 &"
@@ -71,6 +72,25 @@ if [ -e "${WORKDIR_dashboard}/start.sh" ]; then
     echo "nezha-dashboard 启动失败，请检查端口开放情况，并保证参数填写正确，再重新安装！"
   fi
 fi
+
+
+# 独立检查 alist
+if [ -d "${WORKDIR_alist}" ] && ! pgrep -f "screen.*alist" > /dev/null; then
+  echo "检测到 alist 未启动，正在重启..."
+  cd ${WORKDIR_alist} && screen -dmS alist ./alist server
+  echo "alist 正在启动，请耐心等待..."
+  sleep 3
+
+  # 检查 alist 是否成功启动
+  if pgrep -f "screen.*alist" > /dev/null; then
+    echo "alist 已启动，并且在 screen 会话中运行。"
+  else
+    echo "alist 启动失败，请检查端口开放情况，并确保参数填写正确，再重新安装！"
+  fi
+else
+  echo "目录不存在，无需启动。"
+fi
+
 
 
 # 独立检查 X-UI
